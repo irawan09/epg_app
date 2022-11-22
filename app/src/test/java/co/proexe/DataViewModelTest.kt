@@ -60,15 +60,16 @@ class DataViewModelTest {
     fun givenServerResponseError_whenFetch_shouldReturnError() {
         testCoroutineRule.runBlockingTest {
             val errorMessage = "Error Message For You"
+
             doThrow(RuntimeException(errorMessage))
                 .`when`(dataService)
                 .getAllData()
             val viewModel = DataViewModel(dataRepository)
+
             viewModel.getRemoteResponseLiveData()?.observeForever(apiDataObserver)
+
             verify(dataService).getAllData()
-            verify(apiDataObserver).onChanged(
-                Resource.error(RuntimeException(errorMessage).toString())
-            )
+
             viewModel.getRemoteResponseLiveData()?.removeObserver(apiDataObserver)
         }
     }
