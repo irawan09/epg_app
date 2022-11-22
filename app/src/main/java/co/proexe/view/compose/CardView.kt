@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.ProgressIndicatorDefaults.IndicatorBackgroundOpacity
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
@@ -22,10 +21,26 @@ import co.proexe.model.data.TvProgramme
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun CardView(data: TvProgramme) {
-    Card (elevation = 16.dp, modifier = Modifier
+    val dateConvert: SimpleDateFormat =
+        SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+
+    var newStartTime: Date = dateConvert.parse(data.startTime)
+    var newEndTime: Date = dateConvert.parse(data.endTime)
+
+    val cal = Calendar.getInstance()
+    cal.time = newStartTime
+    val startHours = cal.get(Calendar.HOUR_OF_DAY)
+    val startMinutes = cal.get(Calendar.MINUTE)
+    cal.time = newEndTime
+    val endHours = cal.get(Calendar.HOUR_OF_DAY)
+    val endMinutes = cal.get(Calendar.MINUTE)
+
+    Card(elevation = 16.dp, modifier = Modifier
         .fillMaxWidth()
         .fillMaxHeight()
         .padding(1.dp)
@@ -38,14 +53,13 @@ fun CardView(data: TvProgramme) {
             horizontalArrangement = Arrangement.Start
         ) {
             CardPicture(data.imageUrl)
-            Column(modifier = Modifier
-                .fillMaxWidth()){
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
                 CardText(data.title)
-//                LinearProgressIndicator(progress = (data.progressPercent/100).toFloat(),
-//                    backgroundColor = Color.DarkGray,
-//                    color = Color(0xFF4197CA))
+                CardText("${startHours}" + ":" + "${startMinutes}" + " - " + "${endHours}" + ":" + "${endMinutes}" + " | " + "${data.category}")
                 ProgressBar(data.progressPercent)
-//                Spacer(Modifier.height(30.dp))
             }
             ExpandMenu()
         }
@@ -54,7 +68,7 @@ fun CardView(data: TvProgramme) {
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-fun CardPicture(image: String){
+fun CardPicture(image: String) {
     Card(modifier = Modifier.padding(16.dp)) {
         Image(painter = rememberImagePainter(
             data = image,
@@ -64,24 +78,27 @@ fun CardPicture(image: String){
             }
         ),
             contentDescription = null,
-            modifier  = Modifier
+            modifier = Modifier
                 .height(52.dp)
                 .width(52.dp))
     }
 }
 
 @Composable
-fun CardText(data: String){
-    Column(modifier = Modifier
-        .fillMaxWidth()) {
-        Text(modifier = Modifier
-            .height(21.dp)
-            .width(0.dp),
-            color = Color.White,
+fun CardText(data: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Text(
+            modifier = Modifier
+                .height(21.dp)
+                .fillMaxWidth(),
             fontFamily = FontFamily.Serif,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            text = data)
+            text = data
+        )
     }
 }
 
@@ -118,7 +135,7 @@ fun ProgressBar(progress: Int) {
 }
 
 @Composable
-fun ExpandMenu(){
+fun ExpandMenu() {
     var expanded by remember {
         mutableStateOf(false)
     }
