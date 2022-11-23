@@ -66,6 +66,4 @@ class DataRepository @Inject constructor(private val serviceProvider: ServicePro
     fun getDataResponseLiveData(): LiveData<List<TvProgramme>>? {
         return dataResponseLiveData
     }
-
-
 }
